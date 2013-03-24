@@ -42,7 +42,7 @@
 		sendMsg: function(text){
             try{
           	  if(this.socket.readyState != 1){
-          		  this.connect();  
+          		  this.connectSocket();  
           	  } 
           	  this.socket.send(text);
             } catch(exception){

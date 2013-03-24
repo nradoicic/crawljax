@@ -43,6 +43,9 @@ public class CrawljaxWebModule extends ServletModule {
 
 	private File outputFolder() {
 		return new File(System.getProperty("user.home") + File.separatorChar + "crawljax");
+
+		// Doesn't work when run from war.. can't find static variable
+		// return new File(CrawljaxServer.outFolder);
 	}
 
 }

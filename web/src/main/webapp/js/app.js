@@ -18,11 +18,9 @@
     App.ApplicationRoute = Ember.Route.extend({
     	setupController: function(controller, model){
     		controller.set('executionQueue', App.CrawlHistory.findAll(undefined, true));
-    		if(!("WebSocket" in window)){
+    		if(!("WebSocket" in window))
     			alert('Need a Browswer that supports Sockets')
-    		}else{
-    			controller.connectSocket();
-    		}
+    		else controller.connectSocket();
     	}
     });
     
