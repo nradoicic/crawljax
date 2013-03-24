@@ -141,7 +141,7 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
-			<version>9.0.0.RC2</version>
+			<version>${jetty.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -167,9 +167,6 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.12.4</version>
 				<configuration>
-					<systemProperties>
-						<LOG_LEVEL>DEBUG</LOG_LEVEL>
-					</systemProperties>
 					<excludedGroups>${tests.exclude}</excludedGroups>
 				</configuration>
 			</plugin>
