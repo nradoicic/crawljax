@@ -198,6 +198,19 @@ App.CrawlHistory.reopenClass({
 	    });
 	    return allHistory;
 	 },
+	 find: function(id){
+		 var record = App.CrawlHistory.create({id: id });
+		 record.set('isLoading', true);
+		 $.ajax({
+			 url: '/rest/history/' + id,
+			 dataType: 'json',
+			 context: record,
+			 success: function(response){ 
+				 this.setProperties(response); 
+				 this.set('isLoading', false);}
+		 });
+		 return record;
+	 },
 	 add: function(configId, callback)
 	 {
 		 var record = App.CrawlHistory.create({configurationId: configId});

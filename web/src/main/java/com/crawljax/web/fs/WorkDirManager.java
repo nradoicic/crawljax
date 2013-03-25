@@ -96,7 +96,7 @@ public class WorkDirManager {
 
 					// clean up records that crashed unexpectedly
 					if (c.getCrawlStatus() != CrawlStatusType.success
-					        || c.getCrawlStatus() != CrawlStatusType.failure)
+					        && c.getCrawlStatus() != CrawlStatusType.failure)
 						c.setCrawlStatus(CrawlStatusType.failure);
 
 					int length = records.size();

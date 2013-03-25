@@ -61,7 +61,8 @@ public class LoggingSocket extends WebSocketAdapter {
 			appender = new SocketLogAppender(this, crawlId);
 		}
 		if (message.startsWith("stoplog")) {
-			appender.stop();
+			if (appender != null)
+				appender.stop();
 		}
 	}
 

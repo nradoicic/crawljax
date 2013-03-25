@@ -41,12 +41,17 @@
 		},
 		sendMsg: function(text){
             try{
-          	  if(this.socket.readyState != 1){
-          		  this.connectSocket();  
-          	  } 
-          	  this.socket.send(text);
+              var self = this;
+          	  if(self.socket.readyState == 0){
+          		  setTimeout(function(){ self.socket.send(text);  }, 500);
+          	  }
+          	  else if (self.socket.readyState != 1) {
+          		  self.connectSocket();
+          		  setTimeout(function(){ self.socket.send(text);  }, 500);
+          	  }
+          	  else self.socket.send(text);
             } catch(exception){
-               alert("Couldn't send message");
+               alert("Socket Timed out. Refresh your browser. ");
             }
        }
 	});
@@ -155,5 +160,11 @@
     });
     
     App.HistoryController = Ember.Controller.extend({
-    	needs: ['application']
+    	needs: ['application'],
+    	isFinished: function(){
+    		return (this.get('content.crawlStatus') == 'success');
+    	}.property('content.crawlStatus'),
+    	overviewURL : function(){
+    		return "/output/" + this.get('content.id') + "/crawloverview/index.html";
+    	}.property('content.id')
     });

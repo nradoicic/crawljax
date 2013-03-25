@@ -276,16 +276,27 @@
 	</div><!--/span-->
 	</script>	
 	
-	<script type="text/x-handlebars" data-template-name="history">
+	<script type="text/x-handlebars" data-template-name="history/index">
 	<div class="span9">
 		<ul class="nav nav-tabs">
-		{{#view App.NavView route='history_list.history' }}<a href='#' {{action moveTo view.route }}>Log</a>{{/view}}
+		{{#view App.NavView route='history_list.history.index' }}{{#linkTo 'history.index' }}Log{{/linkTo}}{{/view}}
+		{{#if controller.isFinished}}{{#view App.NavView route='history_list.history.overview' }}{{#linkTo 'history.overview' }}Overview{{/linkTo}}{{/view}}{{/if}}
 		</ul>
 		<div id="logPanel"></div>
 	</div><!--/span-->
 	</script>
+	
+	<script type="text/x-handlebars" data-template-name="history/overview">
+	<div class="span9">
+		<ul class="nav nav-tabs">
+		{{#view App.NavView route='history_list.history.index' }}{{#linkTo 'history.index' }}Log{{/linkTo}}{{/view}}
+		{{#view App.NavView route='history_list.history.overview' }}{{#linkTo 'history.overview' }}Overview{{/linkTo}}{{/view}}
+		</ul>
+		<iframe {{bindAttr src="overviewURL"}} id="overviewFrame" scrolling="no" seamless></iframe>
+	</div><!--/span-->
+	</script>
 
-	<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+	<script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/handlebars.js"></script>
 	<script type="text/javascript" src="js/ember-1.0.0-rc.1.js"></script>

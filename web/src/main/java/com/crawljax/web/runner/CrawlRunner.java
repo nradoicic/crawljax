@@ -1,5 +1,6 @@
 package com.crawljax.web.runner;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +40,7 @@ import com.crawljax.oraclecomparator.comparators.ScriptComparator;
 import com.crawljax.oraclecomparator.comparators.SimpleComparator;
 import com.crawljax.oraclecomparator.comparators.StyleComparator;
 import com.crawljax.oraclecomparator.comparators.XPathExpressionComparator;
+import com.crawljax.plugins.crawloverview.CrawlOverview;
 import com.crawljax.web.LogWebSocketServlet;
 import com.crawljax.web.model.ClickRule;
 import com.crawljax.web.model.ClickRule.RuleType;
@@ -191,6 +193,10 @@ public class CrawlRunner {
 				// Comparators
 				if (config.getComparators().size() > 0)
 					setComparatorsFromConfig(config.getComparators(), builder.crawlRules());
+
+				// Add Crawl Overview
+				builder.addPlugin(new CrawlOverview(new File(record.getOutputFolder()
+				        + File.separatorChar + "crawloverview")));
 
 				// Build Crawljax
 				CrawljaxController crawljax = new CrawljaxController(builder.build());

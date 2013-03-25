@@ -11,7 +11,9 @@
    		this.route("new");
    		this.resource("about");
    		this.resource("history_list", {path: "/history"}, function() {
-   			this.resource("history", {path: "/:id"});
+   			this.resource("history", {path: "/:id"}, function(){
+   				this.route("overview");
+   			});
    		});
    	});
 
@@ -106,13 +108,32 @@
     		this.controllerFor('history_list').set('breadcrumb', [App.Link.create({text: "Home", target: "#"}), 
     		                                                      App.Link.create({text: "History", target: "#/history"}),
     		                                                      App.Link.create({text: "Crawl"})]);
-    		var controller = this.controllerFor('history');
-    		var appController = this.controllerFor('application');
-    		setTimeout(function(){ appController.sendMsg('startlog-' + controller.get('content.id')); }, 0); },
+    	},
     	deactivate: function() {
     		this.controllerFor('history_list').set('breadcrumb', [App.Link.create({text: "Home", target: "#"}), 
-    		                                                      App.Link.create({text: "History"})]);
+    		                                                      App.Link.create({text: "History"})]); },
+    	serialize: function(object) { return { id: object.id }; },
+        deserialize: function(params) { return App.CrawlHistory.find(params.id); }
+    });
+    
+    App.HistoryIndexRoute = Ember.Route.extend({
+    	activate: function() {
+    		var controller = this.controllerFor('history');
+    		var appController = this.controllerFor('application');
+    		setTimeout(function(){ 
+    			$('#logPanel').css({'height':(($(document).height())-162)+'px'});
+    			appController.sendMsg('startlog-' + controller.get('content.id')); 
+    			}, 0); },
+    	deactivate: function() {
     		this.controllerFor('application').sendMsg('stoplog'); },
-    	serialize: function(object) { return { id: object.id }; }
-        //deserialize: function(params) { return App.CrawlHistory.find(params.id); }
+    	renderTemplate: function(){ this.render({controller: 'history'}); }
+    });
+    
+    App.HistoryOverviewRoute = Ember.Route.extend({
+    	setupController: function(controller, model) {
+    		setTimeout(function(){ 
+    			$('#overviewFrame').css({'height':(($(document).height())-162)+'px'});
+    		}, 0);
+    	},
+    	renderTemplate: function(){ this.render({controller: 'history'}); }
     });

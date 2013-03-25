@@ -12,7 +12,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
  * Starts the Crawljax server at port 8080.
  */
 public class CrawljaxServer {
-	private static final Boolean DEBUG = false;
+	private static final Boolean EXECUTE_WAR = true;
 	public static String outFolder;
 
 	public static void main(String[] args) throws Exception {
@@ -35,7 +35,7 @@ public class CrawljaxServer {
 	public static WebAppContext buildWebAppContext() throws Exception {
 		WebAppContext webAppContext = new WebAppContext();
 		webAppContext.setContextPath("/");
-		if (!DEBUG) {
+		if (EXECUTE_WAR) {
 			ProtectionDomain domain = CrawljaxServer.class.getProtectionDomain();
 			URL location = domain.getCodeSource().getLocation();
 			webAppContext.setWar(location.toExternalForm());
