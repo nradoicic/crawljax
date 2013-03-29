@@ -8,6 +8,7 @@ import com.crawljax.condition.eventablecondition.EventableCondition;
 import com.crawljax.core.state.Eventable.EventType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.base.Objects;
 
 /**
  * Represents the HTML elements which should be crawled. It represents all the HTML elements in the

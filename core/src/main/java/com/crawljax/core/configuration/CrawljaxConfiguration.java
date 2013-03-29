@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import com.crawljax.browser.EmbeddedBrowser.BrowserType;
-import com.crawljax.condition.UrlCondition;
+import com.crawljax.core.Crawler;
 import com.crawljax.core.CrawljaxException;
 import com.crawljax.core.configuration.CrawlRules.CrawlRulesBuilder;
 import com.crawljax.core.plugin.Plugin;
@@ -20,6 +20,10 @@ import com.google.common.collect.ImmutableList;
  * Configures the {@link Crawler}. Set it up using the {@link #builderFor(String)} function.
  */
 public final class CrawljaxConfiguration {
+
+	static final long DEFAULT_MAX_RUNTIME = TimeUnit.HOURS.toMillis(1);
+	static final int DEFAULT_MAX_STATES = 0;
+	static final int DEFAULT_MAX_DEPTH = 2;
 
 	public static class CrawljaxConfigurationBuilder {
 
@@ -137,15 +141,10 @@ public final class CrawljaxConfiguration {
 
 		public CrawljaxConfiguration build() {
 			config.plugins = new Plugins(pluginBuilder.build());
-			addBasicRules(config.url);
 			config.crawlRules = crawlRules.build();
 			return config;
 		}
 
-		private void addBasicRules(URL url) {
-			crawlRules.addCrawlCondition("Don't leave the current URL",
-			        new UrlCondition(url.getHost()));
-		}
 	}
 
 	/**
@@ -179,9 +178,9 @@ public final class CrawljaxConfiguration {
 
 	private CrawlRules crawlRules;
 
-	private int maximumStates = 0;
-	private long maximumRuntime = TimeUnit.HOURS.toMillis(1);;
-	private int maximumDepth = 2;
+	private int maximumStates = DEFAULT_MAX_STATES;
+	private long maximumRuntime = DEFAULT_MAX_RUNTIME;
+	private int maximumDepth = DEFAULT_MAX_DEPTH;
 
 	private CrawljaxConfiguration() {
 	}
@@ -244,17 +243,17 @@ public final class CrawljaxConfiguration {
 		if (this == obj) {
 			return true;
 		}
-		
+
 		if (obj == null) {
 			return false;
 		}
-		
+
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		
+
 		CrawljaxConfiguration other = (CrawljaxConfiguration) obj;
-		
+
 		if (browserConfig == null) {
 			if (other.browserConfig != null) {
 				return false;
@@ -262,7 +261,7 @@ public final class CrawljaxConfiguration {
 		} else if (!browserConfig.equals(other.browserConfig)) {
 			return false;
 		}
-		
+
 		if (crawlRules == null) {
 			if (other.crawlRules != null) {
 				return false;
@@ -270,19 +269,19 @@ public final class CrawljaxConfiguration {
 		} else if (!crawlRules.equals(other.crawlRules)) {
 			return false;
 		}
-		
+
 		if (maximumDepth != other.maximumDepth) {
 			return false;
 		}
-		
+
 		if (maximumRuntime != other.maximumRuntime) {
 			return false;
 		}
-		
+
 		if (maximumStates != other.maximumStates) {
 			return false;
 		}
-		
+
 		if (plugins == null) {
 			if (other.plugins != null) {
 				return false;
@@ -290,7 +289,7 @@ public final class CrawljaxConfiguration {
 		} else if (!plugins.equals(other.plugins)) {
 			return false;
 		}
-		
+
 		if (proxyConfiguration == null) {
 			if (other.proxyConfiguration != null) {
 				return false;
@@ -298,7 +297,7 @@ public final class CrawljaxConfiguration {
 		} else if (!proxyConfiguration.equals(other.proxyConfiguration)) {
 			return false;
 		}
-		
+
 		try {
 			if (url == null) {
 				if (other.url != null) {
@@ -307,10 +306,10 @@ public final class CrawljaxConfiguration {
 			} else if (!url.toURI().equals(other.url.toURI())) {
 				return false;
 			}
-		} catch( URISyntaxException e) {
-			return false; 
+		} catch (URISyntaxException e) {
+			return false;
 		}
-		
+
 		return true;
 	}
 

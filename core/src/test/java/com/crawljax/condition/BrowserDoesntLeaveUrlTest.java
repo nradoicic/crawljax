@@ -17,6 +17,6 @@ public class BrowserDoesntLeaveUrlTest {
 	public void whenJavaScriptNavigatesAwayFromPageItIsBlocked() throws Exception {
 		BaseCrawler crawler = new BaseCrawler("navigate_other_urls.html");
 		CrawlSession session = crawler.crawl();
-		assertThat(session.getStateFlowGraph(), hasStates(2));
+		assertThat(session.getStateFlowGraph(), hasStates(1));
 	}
 }

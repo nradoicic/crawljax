@@ -40,7 +40,7 @@ import com.crawljax.util.UrlUtils;
  */
 public class Crawler implements Runnable {
 
-	private static final Logger LOG = LoggerFactory.getLogger(Crawler.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(Crawler.class);
 
 	/**
 	 * The main browser window 1 to 1 relation; Every Thread will get on browser assigned in the run
@@ -105,7 +105,7 @@ public class Crawler implements Runnable {
 	 * @see Crawler#clickTag(Eventable)
 	 */
 	private enum ClickResult {
-		CLONE_DETECTED, NEW_STATE, DOM_UNCHANGED
+		CLONE_DETECTED, NEW_STATE, DOM_UNCHANGED, LEFT_DOMAIN
 	}
 
 	/**
@@ -340,11 +340,21 @@ public class Crawler implements Runnable {
 		LOG.debug("Executing {} on element: {}; State: {}", eventable.getEventType(),
 		        eventable, this.getStateMachine().getCurrentState().getName());
 		if (this.fireEvent(eventable)) {
+			return inspectPotentialNewState(eventable);
+		} else {
+			return ClickResult.DOM_UNCHANGED;
+		}
+
+	}
+
+	private ClickResult inspectPotentialNewState(final Eventable eventable) {
+		if (urlIsOutsideDomain(getBrowser().getCurrentUrl())) {
+			return ClickResult.LEFT_DOMAIN;
+		} else {
 			StateVertex newState =
 			        new StateVertex(getBrowser().getCurrentUrl(), controller.getSession()
 			                .getStateFlowGraph().getNewStateName(), getBrowser().getDom(),
 			                this.controller.getStrippedDom(getBrowser()));
-
 			if (domChanged(eventable, newState)) {
 
 				controller.getSession().addEventableToCrawlPath(eventable);
@@ -356,10 +366,19 @@ public class Crawler implements Runnable {
 					// Dom changed; Clone
 					return ClickResult.CLONE_DETECTED;
 				}
+			} else {
+				return ClickResult.DOM_UNCHANGED;
 			}
 		}
-		// Event not fired or, Dom not changed
-		return ClickResult.DOM_UNCHANGED;
+	}
+
+	private boolean urlIsOutsideDomain(String currentUrl) {
+		try {
+			return !new URL(currentUrl).getHost().equalsIgnoreCase(config.getUrl().getHost());
+		} catch (MalformedURLException e) {
+			LOG.warn("The new URL wasn't a valid one. That's weird.", e);
+			return true;
+		}
 	}
 
 	private boolean domChanged(final Eventable eventable, StateVertex newState) {
@@ -413,6 +432,7 @@ public class Crawler implements Runnable {
 					spawnThreads(orrigionalState);
 					break;
 				case DOM_UNCHANGED:
+				case LEFT_DOMAIN:
 					break;
 				default:
 					throw new IllegalStateException("Unrecognized click result " + clickResult);
@@ -464,12 +484,14 @@ public class Crawler implements Runnable {
 				return false;
 			}
 			ClickResult result = this.crawlAction(action);
-			orrigionalState.finishedWorking(this, action);
+			orrigionalState.markActionAsFinished(this, action);
 			switch (result) {
 				case NEW_STATE:
 					return newStateDetected(orrigionalState);
 				case CLONE_DETECTED:
 					return true;
+				case LEFT_DOMAIN:
+					return false;
 				default:
 					break;
 			}
