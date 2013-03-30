@@ -32,6 +32,7 @@ import com.crawljax.forms.FormHandler;
 import com.crawljax.forms.FormInput;
 import com.crawljax.util.ElementResolver;
 import com.crawljax.util.UrlUtils;
+import com.google.common.base.Joiner;
 
 /**
  * Class that performs crawl actions. It is designed to run inside a Thread.
@@ -267,12 +268,19 @@ public class Crawler implements Runnable {
 	/**
 	 * Reload the browser following the {@link #backTrackPath} to the given currentEvent.
 	 * 
+	 * @param newCralwer
+	 *            If you choose <code>false</code> Crawljax will reset the browser first.
 	 * @throws CrawljaxException
 	 *             if the {@link Eventable#getTargetStateVertex()} encounters an error.
 	 */
-	private void goBackExact() throws CrawljaxException {
+	private void goBackExact(boolean newCralwer) throws CrawljaxException {
 		StateVertex curState = controller.getSession().getInitialState();
-
+		if (!newCralwer) {
+			getBrowser().goToUrl(config.getUrl());
+			controller.doBrowserWait(getBrowser());
+			stateMachine.rewind();
+			depth.set(0);
+		}
 		for (Eventable clickable : backTrackPath) {
 
 			if (!controller.getElementChecker().checkCrawlCondition(getBrowser())) {
@@ -286,7 +294,9 @@ public class Crawler implements Runnable {
 
 			curState = clickable.getTargetStateVertex();
 
-			controller.getSession().addEventableToCrawlPath(clickable);
+			if (!newCralwer) {
+				controller.getSession().addEventableToCrawlPath(clickable);
+			}
 
 			this.handleInputElements(clickable);
 
@@ -431,8 +441,8 @@ public class Crawler implements Runnable {
 					// Recurse because new state found
 					spawnThreads(orrigionalState);
 					break;
-				case DOM_UNCHANGED:
 				case LEFT_DOMAIN:
+				case DOM_UNCHANGED:
 					break;
 				default:
 					throw new IllegalStateException("Unrecognized click result " + clickResult);
@@ -491,7 +501,7 @@ public class Crawler implements Runnable {
 				case CLONE_DETECTED:
 					return true;
 				case LEFT_DOMAIN:
-					return false;
+					goBackExact(false);
 				default:
 					break;
 			}
@@ -574,7 +584,7 @@ public class Crawler implements Runnable {
 		 * go back into the previous state.
 		 */
 		try {
-			this.goBackExact();
+			this.goBackExact(true);
 		} catch (CrawljaxException e) {
 			LOG.error("Failed to backtrack", e);
 		}
