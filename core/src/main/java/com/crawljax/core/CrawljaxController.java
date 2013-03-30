@@ -295,9 +295,6 @@ public class CrawljaxController implements CrawlQueueManager {
 	 */
 	private void shutdown(long timeCrawlCalc) {
 		StateFlowGraph stateFlowGraph = this.getSession().getStateFlowGraph();
-		for (Eventable c : stateFlowGraph.getAllEdges()) {
-			LOGGER.info("Interaction Element= " + c.toString());
-		}
 		LOGGER.info("Total Crawling time(" + timeCrawlCalc + "ms) ~= "
 		        + formatRunningTime(timeCrawlCalc));
 		LOGGER.info("EXAMINED ELEMENTS: " + elementChecker.numberOfExaminedElements());

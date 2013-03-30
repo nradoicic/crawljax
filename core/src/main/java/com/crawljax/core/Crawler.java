@@ -59,7 +59,7 @@ public class Crawler implements Runnable {
 	/**
 	 * Depth register.
 	 */
-	private AtomicInteger depth = new AtomicInteger();
+	private final AtomicInteger depth = new AtomicInteger();
 
 	/**
 	 * The path followed from the index to the current state.
@@ -155,7 +155,7 @@ public class Crawler implements Runnable {
 	 * Brings the browser to the initial state.
 	 */
 	public void goToInitialURL() {
-		LOG.info("Loading Page {}", config.getUrl());
+		LOG.debug("Loading Page {}", config.getUrl());
 		getBrowser().goToUrl(config.getUrl());
 		controller.doBrowserWait(getBrowser());
 		plugins.runOnUrlLoadPlugins(getBrowser());
@@ -174,21 +174,21 @@ public class Crawler implements Runnable {
 		        && eventable.getRelatedFrame().equals("")) {
 			eventToFire = resolveByXpath(eventable, eventToFire);
 		}
-		boolean fired = false;
+		boolean isFired = false;
 		try {
-			fired = getBrowser().fireEvent(eventToFire);
+			isFired = getBrowser().fireEvent(eventToFire);
 		} catch (ElementNotVisibleException | NoSuchElementException e) {
 			if (config.getCrawlRules().isCrawlHiddenAnchors() && eventToFire.getElement() != null
 			        && "A".equals(eventToFire.getElement().getTag())) {
-				fired = visitAnchorHrefIfPossible(eventToFire);
+				isFired = visitAnchorHrefIfPossible(eventToFire);
 			} else {
 				LOG.debug("Ignoring invisble element {}", eventToFire.getElement());
 			}
 		}
 
-		LOG.debug("Event fired={} for eventable {}", fired, eventable);
+		LOG.debug("Event fired={} for eventable {}", isFired, eventable);
 
-		if (fired) {
+		if (isFired) {
 
 			/*
 			 * Let the controller execute its specified wait operation on the browser thread safe.
@@ -235,7 +235,7 @@ public class Crawler implements Runnable {
 		if (href == null) {
 			LOG.info("Anchor {} has no href and is invisble so it will be ignored", element);
 		} else {
-			LOG.info("Found an invisible link with href={}", href);
+			LOG.debug("Found an invisible link with href={}", href);
 			try {
 				URL url = UrlUtils.extractNewUrl(browser.getCurrentUrl(), href);
 				browser.goToUrl(url);
@@ -540,7 +540,7 @@ public class Crawler implements Runnable {
 
 		// An event has been fired so we are one level deeper
 		int d = depth.incrementAndGet();
-		LOG.info("RECURSIVE Call crawl; Current DEPTH= {}", d);
+		LOG.debug("RECURSIVE Call crawl; Current DEPTH= {}", d);
 		if (!this.crawl()) {
 			// Crawling has stopped
 			controller.terminate(false);

@@ -9,14 +9,15 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.crawljax.oraclecomparator.comparators.EditDistanceComparator;
+
 /**
  * Test the edit distance algorithm.
- * 
- * @author mesbah
  */
 public class EditDistanceTest extends TestCase {
 
 	private static final Logger LOG = LoggerFactory.getLogger(EditDistanceTest.class);
+	private EditDistanceComparator editDistComparator = new EditDistanceComparator();
 
 	/**
 	 * Check if threshold calculation works.
@@ -28,7 +29,7 @@ public class EditDistanceTest extends TestCase {
 
 		double expected = (2 * Math.max(x.length(), y.length()) * (1 - p));
 
-		assertEquals(expected, EditDistance.getThreshold(x, y, p));
+		assertEquals(expected, editDistComparator.getThreshold(x, y, p));
 	}
 
 	/**
@@ -39,21 +40,21 @@ public class EditDistanceTest extends TestCase {
 		String y = "<form>blabla</form>";
 
 		LOG.debug(StringUtils.getLevenshteinDistance(x, y) + " Thesh: "
-		        + EditDistance.getThreshold(x, y, 0.7));
-		assertTrue(EditDistance.isClone(x, y, 0.0));
-		assertTrue(EditDistance.isClone(x, y, 0.5));
-		assertTrue(EditDistance.isClone(x, y, 0.7));
-		assertTrue(EditDistance.isClone(x, y, 0.75));
-		assertTrue(EditDistance.isClone(x, y, 0.84));
-		assertFalse(EditDistance.isClone(x, y, 0.89));
-		assertFalse(EditDistance.isClone(x, y, 0.893));
-		assertFalse(EditDistance.isClone(x, y, 0.9));
-		assertFalse(EditDistance.isClone(x, y, 1));
+		        + editDistComparator.getThreshold(x, y, 0.7));
+		assertTrue(editDistComparator.isClone(x, y, 0.0));
+		assertTrue(editDistComparator.isClone(x, y, 0.5));
+		assertTrue(editDistComparator.isClone(x, y, 0.7));
+		assertTrue(editDistComparator.isClone(x, y, 0.75));
+		assertTrue(editDistComparator.isClone(x, y, 0.84));
+		assertFalse(editDistComparator.isClone(x, y, 0.89));
+		assertFalse(editDistComparator.isClone(x, y, 0.893));
+		assertFalse(editDistComparator.isClone(x, y, 0.9));
+		assertFalse(editDistComparator.isClone(x, y, 1));
 
 		boolean arg = false;
 
 		try {
-			EditDistance.isClone(x, y, -2);
+			editDistComparator.isClone(x, y, -2);
 		} catch (IllegalArgumentException e) {
 			arg = true;
 		}
@@ -63,7 +64,7 @@ public class EditDistanceTest extends TestCase {
 		arg = false;
 
 		try {
-			EditDistance.isClone(x, y, 2);
+			editDistComparator.isClone(x, y, 2);
 		} catch (IllegalArgumentException e) {
 			arg = true;
 		}
