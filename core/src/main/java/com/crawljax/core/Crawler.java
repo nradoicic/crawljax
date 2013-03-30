@@ -275,13 +275,18 @@ public class Crawler implements Runnable {
 	 */
 	private void goBackExact(boolean newCralwer) throws CrawljaxException {
 		StateVertex curState = controller.getSession().getInitialState();
+		CrawlPath path;
 		if (!newCralwer) {
 			getBrowser().goToUrl(config.getUrl());
 			controller.doBrowserWait(getBrowser());
 			stateMachine.rewind();
 			depth.set(0);
+			path = controller.getSession().getCurrentCrawlPath().immutableCopy(false);
+		} else {
+			path = backTrackPath;
 		}
-		for (Eventable clickable : backTrackPath) {
+
+		for (Eventable clickable : path) {
 
 			if (!controller.getElementChecker().checkCrawlCondition(getBrowser())) {
 				return;
@@ -394,17 +399,6 @@ public class Crawler implements Runnable {
 	private boolean domChanged(final Eventable eventable, StateVertex newState) {
 		return plugins.runDomChangeNotifierPlugins(this.getStateMachine().getCurrentState(),
 		        eventable, newState, getBrowser());
-	}
-
-	/**
-	 * Return the Exacteventpath.
-	 * 
-	 * @return the exacteventpath
-	 * @deprecated use {@link CrawlSession#getCurrentCrawlPath()}
-	 */
-	@Deprecated
-	public final List<Eventable> getExacteventpath() {
-		return controller.getSession().getCurrentCrawlPath();
 	}
 
 	private void spawnThreads(StateVertex state) {
@@ -580,9 +574,6 @@ public class Crawler implements Runnable {
 		this.candidateExtractor =
 		        new CandidateElementExtractor(controller.getElementChecker(), this.getBrowser(),
 		                formHandler, config);
-		/**
-		 * go back into the previous state.
-		 */
 		try {
 			this.goBackExact(true);
 		} catch (CrawljaxException e) {
